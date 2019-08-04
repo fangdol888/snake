@@ -60,11 +60,6 @@ namespace app{
 		public bool move(int dir){//이동 후 종료 결정
 			this.dir = dir;
 			
-			printPoint(body[len-1].x,body[len-1].y, "  "); //delete trail
-			
-			for(int i = body.Count-1;i > 0; i--){
-				body[i].setPoint(body[i-1].x,body[i-1].y);
-			}
 			
 			dx=0;
 			dy=0;
@@ -102,10 +97,17 @@ namespace app{
 					}
 				}
 			}
-			else{
+			else{ //아님 그냥 이동
+				printPoint(body[len-1].x,body[len-1].y, "  "); //delete trail
+			
+				for(int i = body.Count-1;i > 0; i--){
+					body[i].setPoint(body[i-1].x,body[i-1].y);
+				}
+			
 				body[0].x+=dx; //그 뱡향으로 머리 이동
 				body[0].y+=dy;
 			}
+			
 			printBody();
 			
 			for(int i = 1; i < body.Count; i++){
@@ -161,7 +163,6 @@ namespace app{
 			drawMap(); //초기 맵 그리기
 			snake.printBody();
 			drawPray();
-			
 			while(true){
 				
 				//딜레이
