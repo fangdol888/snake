@@ -38,6 +38,8 @@ namespace app{
 	
 	public class Snake{
 		public List<Point> body = new List<Point>(); //몸
+		int nFrame = 10;
+		int nStay;
 		
 		public static string[] shape = {"▲" ,"▼","◀","▶","◆","▣","◈"};//모양
 		int dir= (int)direction.right; //방향변수
@@ -46,15 +48,25 @@ namespace app{
 		
 		public Snake(){ //초기화
 			for(int i =0; i < len ; i++){				
-				body.Add(new Point(20,12+i)); //뱀 초기 위치
+				body.Add(new Point(Map.x/2,12+i)); //뱀 초기 위치
 			}
-			
+			nStay = nFrame;
 			dir = (int)direction.up;
 		}
 		
 		public void eat(Point pray){//다음 위치가 먹이일때
 			body.Insert(0,new Point(pray.x,pray.y)); //길이 길어짐
 			len++; //길이 늘어남
+		}
+		
+		public bool countFrame(){
+			if(nFrame > 0){
+				nFrame--;
+				return false;
+			}else{
+				nFrame = nStay-1;
+				return true;
+			}
 		}
 		
 		public bool move(int dir){//이동 후 종료 결정
@@ -115,7 +127,7 @@ namespace app{
 					return false;//게임오버
 				}
 			}
-			if(body[0].x == 0 || body[0].x == 40 || body[0].y == 0 || body[0].y == 23) return false; // 벽 충돌 
+			if(body[0].x == 0 || body[0].x == Map.x-1 || body[0].y == 0 || body[0].y == Map.y-1) return false; // 벽 충돌 
 			
 			return true;
 		}
@@ -136,7 +148,7 @@ namespace app{
 	}
 	
 	public class Map{
-		public static int x = 40, y=24; //맵 크기
+		public static int x = 20, y=24; //맵 크기
 		Snake snake = new Snake();
 		public static Point pray; //먹이 위치
 		public static int score = 0;
@@ -160,13 +172,11 @@ namespace app{
 			Snake snake = new Snake();
 			int dir = (int)direction.up; //초기 방향
 			char input;
+			int frame = 60;
 			drawMap(); //초기 맵 그리기
 			snake.printBody();
 			drawPray();
 			while(true){
-				
-				//딜레이
-				Thread.Sleep(200);
 				
 				//키 입력 시 방향 전환
 				if(Console.KeyAvailable == true){
@@ -186,19 +196,31 @@ namespace app{
 						case 'd':
 						dir = (int)direction.right;
 						break;
+						case 'q':
+						return;//종료
+						case 'p':
+						while(Console.ReadKey(true).KerChar != 'p'){}
+						break;
 					}
 				}
-
+				
 				//이동
-				if(snake.move(dir)){ //움직이는데 성공 했나?
-					drawStatus();
-					drawPray();
-				}else{
+				if(snake.countFrame()){ //움직이는데 성공 했나?
+					if(snake.move(dir)){
+						drawStatus();
+						drawPray();
+					}
+					else{//벽이나 몸 충돌시
 					//게임오버 출력
-					
 					// 나가기
 					break;
+					}
 				}
+				
+				
+				
+				//딜레이
+				Thread.Sleep(1000/frame);
 			}
 		}
 		
@@ -209,11 +231,11 @@ namespace app{
 			
 			for(int i=1;i< Map.y-1;i++){
 				printPoint(0,i,Snake.shape[(int)S.wall]);
-				printPoint(39,i,Snake.shape[(int)S.wall]);
+				printPoint(Map.x-1,i,Snake.shape[(int)S.wall]);
 			}
 			
 			for(int i= 0 ; i< Map.x;i++){
-				printPoint(i,23,Snake.shape[(int)S.wall]);
+				printPoint(i,Map.y-1,Snake.shape[(int)S.wall]);
 			}
 			drawStatus();
 		}
