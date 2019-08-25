@@ -199,7 +199,7 @@ namespace app{
 						case 'q':
 						return;//종료
 						case 'p':
-						while(Console.ReadKey(true).KerChar != 'p'){}
+						while(Console.ReadKey(true).KeyChar != 'p'){}
 						break;
 					}
 				}
